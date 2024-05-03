@@ -48,3 +48,36 @@ test.describe(
     }
   }
 );
+
+const firstElement = (page: Page) => page.locator('#column-a');
+const secondElement = (page: Page) => page.locator('#column-b');
+
+test(
+  'Test Drag and Drop',
+  { annotation: { type: 'info', description: 'The page loads with A before B' } },
+  async ({ page }) => {
+    await test.step('Go to the Drag and Drop page', async () => {
+      await page.goto('/');
+      await page.getByRole('link', { name: 'Drag and Drop' }).click();
+    });
+
+    await test.step('Move A to B', async () => {
+      await firstElement(page)
+        .filter({ hasText: 'A' })
+        .dragTo(secondElement(page).filter({ hasText: 'B' }));
+    });
+
+    expect
+      .soft(
+        await firstElement(page).textContent(),
+        'The first element have the B value'
+      )
+      .toBe('B');
+    expect
+      .soft(
+        await secondElement(page).textContent(),
+        'The second element have the A value'
+      )
+      .toBe('A');
+  }
+);
