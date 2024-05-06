@@ -76,7 +76,7 @@ test(
   async ({ page }) => {
     await test.step('Go to the Drag and Drop page', async () => {
       await page.goto('/');
-      await pageLink(page, 'Drag and Drop ').click();
+      await pageLink(page, 'Drag and Drop').click();
     });
 
     await test.step('Move A to B', async () => {
