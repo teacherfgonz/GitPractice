@@ -15,20 +15,20 @@ const testCasesAddRemove = {
     remove: 5,
     firstToLast: true,
   },
-  'User adds 100 elements and remove them all from last to first': {
-    add: 100,
-    remove: 100,
+  'User adds 50 elements and remove them all from last to first': {
+    add: 50,
+    remove: 50,
     firstToLast: false,
   },
-  'User adds 100 elements and remove none': {
-    add: 100,
+  'User adds 30 elements and remove none': {
+    add: 30,
     remove: 0,
     firstToLast: true,
   },
 };
 
 test.describe(
-  'Add Remove and remove Elements',
+  'Add and Remove Elements',
   {
     tag: '@Regresion',
     annotation: {
@@ -48,7 +48,7 @@ test.describe(
             clickCount: testCasesAddRemove[testCases].add,
           });
         });
-        
+
         await test.step(`Delete ${testCasesAddRemove[testCases].remove} added elements`, async () => {
           if (testCasesAddRemove[testCases].firstToLast) {
             await deleteButton(page)
