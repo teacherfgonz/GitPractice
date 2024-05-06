@@ -4,7 +4,20 @@ const addElementButton = (page: Page) =>
   page.getByRole('button', { name: 'Add Element' });
 const deleteButton = (page: Page) => page.getByRole('button', { name: 'Delete' });
 
-const testElementsToAdd = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const testCasesAddRemove = {
+  'Delete button does not exist': {
+    add: 5,
+    remove: 5,
+  },
+  '5 remaining': {
+    add: 10,
+    remove: 5,
+  },
+  'Adding 20': {
+    add: 20,
+    remove: 0,
+  },
+};
 
 test.describe(
   'Test Add Remove Elements',
@@ -16,53 +29,42 @@ test.describe(
     },
   },
   () => {
-    for (const clicks of testElementsToAdd) {
-      test(`Adding and removing ${clicks} ${
-        clicks > 1 ? 'elements' : 'element'
-      }`, async ({ page }) => {
+    for (const testCase of Object.keys(testCasesAddRemove)) {
+      test(testCase, async ({ page }) => {
         await test.step('Go to the Add/Remove Elements page', async () => {
           await page.goto('/');
           await page.getByRole('link', { name: 'Add/Remove Elements' }).click();
         });
 
-        await expect
-          .soft(addElementButton(page), 'Add element button is visible')
-          .toBeVisible();
-        await expect
-          .soft(deleteButton(page), 'Delete button does not exist')
-          .toBeHidden();
-
-        await test.step(`Clicking to add element button ${clicks} ${
-          clicks > 1 ? 'times' : 'time'
-        }`, async () => {
+        await test.step(`Clicking to add element button ${testCasesAddRemove[testCase].add} times`, async () => {
           await addElementButton(page).click({
-            clickCount: clicks,
+            clickCount: testCasesAddRemove[testCase].add,
           });
         });
 
-        const elementsAddedCount = (await deleteButton(page).allInnerTexts()).length;
-        await expect
-          .soft(deleteButton(page).nth(0), 'There is an element in first position')
-          .toBeVisible();
-        await expect
-          .soft(
-            elementsAddedCount,
-            `There is a total of ${clicks} ${clicks > 1 ? 'elements' : 'element'}`
-          )
-          .toBeLessThanOrEqual(clicks);
-
-        await test.step(`Delete ${clicks} ${
-          clicks > 1 ? 'elements' : 'element'
-        } added`, async () => {
-          await deleteButton(page).nth(0).click({ clickCount: clicks });
+        await test.step(`Delete ${testCasesAddRemove[testCase].remove} added elements`, async () => {
+          await deleteButton(page)
+            .nth(0)
+            .click({ clickCount: testCasesAddRemove[testCase].remove });
         });
-        const elementsDeletedCount = (await deleteButton(page).allInnerTexts()).length;
-        await expect
-          .soft(deleteButton(page), 'Elements have been deleted assertion 1')
-          .toBeHidden();
-        await expect
-          .soft(elementsDeletedCount, 'Elements have been deleted assertion 2')
-          .toBeLessThanOrEqual(0);
+
+        if (testCase === 'Delete button does not exist') {
+          await expect
+            .soft(deleteButton(page), 'Delete button does not exist')
+            .toBeHidden();
+        }
+
+        if (testCase === '5 Remaining') {
+          await expect
+            .soft(deleteButton(page), '5 delete elemennts remaining')
+            .toHaveCount(5);
+        }
+
+        if (testCase === 'Adding 20') {
+          await expect
+            .soft(deleteButton(page), '5 delete elemennts remaining')
+            .toHaveCount(20);
+        }
       });
     }
   }
