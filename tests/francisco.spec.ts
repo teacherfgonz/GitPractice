@@ -5,22 +5,30 @@ const addElementButton = (page: Page) =>
 const deleteButton = (page: Page) => page.getByRole('button', { name: 'Delete' });
 
 const testCasesAddRemove = {
-  'Delete button does not exist': {
-    add: 5,
-    remove: 5,
+  'User adds elements and remove them all': {
+    add: 20,
+    remove: 20,
+    firstToLast: true,
   },
-  '5 remaining': {
+  'User adds 10 elements and remove 5': {
     add: 10,
     remove: 5,
+    firstToLast: true,
   },
-  'Adding 20': {
-    add: 20,
+  'User adds 100 elements and remove them all from last to first': {
+    add: 100,
+    remove: 100,
+    firstToLast: false,
+  },
+  'User adds 100 elements and remove none': {
+    add: 100,
     remove: 0,
+    firstToLast: true,
   },
 };
 
 test.describe(
-  'Test Add Remove Elements',
+  'Add Remove and remove Elements',
   {
     tag: '@Regresion',
     annotation: {
@@ -29,42 +37,36 @@ test.describe(
     },
   },
   () => {
-    for (const testCase of Object.keys(testCasesAddRemove)) {
-      test(testCase, async ({ page }) => {
+    for (const testCases of Object.keys(testCasesAddRemove)) {
+      test(testCases, async ({ page }) => {
         await test.step('Go to the Add/Remove Elements page', async () => {
           await page.goto('/');
           await page.getByRole('link', { name: 'Add/Remove Elements' }).click();
         });
-
-        await test.step(`Clicking to add element button ${testCasesAddRemove[testCase].add} times`, async () => {
+        await test.step(`Clicking  add element button ${testCasesAddRemove[testCases].add} times`, async () => {
           await addElementButton(page).click({
-            clickCount: testCasesAddRemove[testCase].add,
+            clickCount: testCasesAddRemove[testCases].add,
           });
         });
-
-        await test.step(`Delete ${testCasesAddRemove[testCase].remove} added elements`, async () => {
-          await deleteButton(page)
-            .nth(0)
-            .click({ clickCount: testCasesAddRemove[testCase].remove });
+        
+        await test.step(`Delete ${testCasesAddRemove[testCases].remove} added elements`, async () => {
+          if (testCasesAddRemove[testCases].firstToLast) {
+            await deleteButton(page)
+              .nth(0)
+              .click({ clickCount: testCasesAddRemove[testCases].remove });
+          } else {
+            for (let i = testCasesAddRemove[testCases].remove - 1; i > -1; i--) {
+              await deleteButton(page).nth(i).click();
+            }
+          }
         });
 
-        if (testCase === 'Delete button does not exist') {
-          await expect
-            .soft(deleteButton(page), 'Delete button does not exist')
-            .toBeHidden();
-        }
+        const deleteBtnNumber =
+          testCasesAddRemove[testCases].add - testCasesAddRemove[testCases].remove;
 
-        if (testCase === '5 Remaining') {
-          await expect
-            .soft(deleteButton(page), '5 delete elemennts remaining')
-            .toHaveCount(5);
-        }
-
-        if (testCase === 'Adding 20') {
-          await expect
-            .soft(deleteButton(page), '5 delete elemennts remaining')
-            .toHaveCount(20);
-        }
+        await expect
+          .soft(deleteButton(page), `${deleteBtnNumber} delete element(s) remaining`)
+          .toHaveCount(deleteBtnNumber);
       });
     }
   }
