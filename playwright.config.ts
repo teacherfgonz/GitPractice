@@ -18,7 +18,7 @@ export default defineConfig({
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 1,
   /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
+  workers: process.env.CI ? 4 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
@@ -34,7 +34,7 @@ export default defineConfig({
   /* Configure projects for major browsers */
   projects: [
     {
-      name: 'Google Chrome',
+      name: 'Chrome',
       use: { ...devices['Desktop Chrome'], channel: 'chrome' },
     },
 
@@ -42,30 +42,10 @@ export default defineConfig({
       name: 'Firefox',
       use: { ...devices['Desktop Firefox'] },
     },
-
-    /* Test against mobile viewports. */
     {
-      name: 'Mobile - Pixel 5',
+      name: 'Android',
       use: { ...devices['Pixel 5'] },
     },
-    {
-      name: 'Mobile - iPad (gen 7)',
-      use: { ...devices['iPad (gen 7)'] },
-    },
-    {
-      name: 'Tablet - iPhone 12',
-      use: { ...devices['iPhone 12'] },
-    },
-
-    /* Test against branded browsers. */
-    // {
-    //   name: 'Microsoft Edge',
-    //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
-    // },
-    // {
-    //   name: 'Google Chrome',
-    //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
-    // },
   ],
 
   /* Run your local dev server before starting the tests */
